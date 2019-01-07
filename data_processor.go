@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/dailyburn/ratchet/data"
+	"github.com/MrLYC/ratchet/data"
 )
 
 // DataProcessor is the interface that should be implemented to perform data-related
@@ -25,12 +25,12 @@ type DataProcessor interface {
 	Finish(outputChan chan data.JSON, killChan chan error)
 }
 
-// dataProcessor is a type used internally to the Pipeline management
+// StageDataProcessor is a type used internally to the Pipeline management
 // code, and wraps a DataProcessor instance. DataProcessor is the main
 // interface that should be implemented to perform work within the data
-// pipeline, and this dataProcessor type simply embeds it and adds some
+// pipeline, and this StageDataProcessor type simply embeds it and adds some
 // helpful channel management and other attributes.
-type dataProcessor struct {
+type StageDataProcessor struct {
 	DataProcessor
 	executionStat
 	concurrentDataProcessor
@@ -45,7 +45,7 @@ type chanBrancher struct {
 	branchOutChans []chan data.JSON
 }
 
-func (dp *dataProcessor) branchOut() {
+func (dp *StageDataProcessor) branchOut() {
 	go func() {
 		for d := range dp.outputChan {
 			for _, out := range dp.branchOutChans {
@@ -69,7 +69,7 @@ type chanMerger struct {
 	mergeWait    sync.WaitGroup
 }
 
-func (dp *dataProcessor) mergeIn() {
+func (dp *StageDataProcessor) mergeIn() {
 	// Start a merge goroutine for each input channel.
 	mergeData := func(c chan data.JSON) {
 		for d := range c {
@@ -88,15 +88,15 @@ func (dp *dataProcessor) mergeIn() {
 	}()
 }
 
-// Do takes a DataProcessor instance and returns the dataProcessor
+// Do takes a DataProcessor instance and returns the StageDataProcessor
 // type that will wrap it for internal ratchet processing. The details
-// of the dataProcessor wrapper type are abstracted away from the
+// of the StageDataProcessor wrapper type are abstracted away from the
 // implementing end-user code. The "Do" function is named
 // succinctly to provide a nicer syntax when creating a PipelineLayout.
 // See the ratchet package documentation for code examples of creating
 // a new branching pipeline layout.
-func Do(processor DataProcessor) *dataProcessor {
-	dp := dataProcessor{DataProcessor: processor}
+func Do(processor DataProcessor) *StageDataProcessor {
+	dp := StageDataProcessor{DataProcessor: processor}
 	dp.outputChan = make(chan data.JSON)
 	dp.inputChan = make(chan data.JSON)
 
@@ -114,12 +114,12 @@ func Do(processor DataProcessor) *dataProcessor {
 // Outputs should be called to specify which DataProcessor instances the current
 // processor should send it's output to. See the ratchet package
 // documentation for code examples and diagrams.
-func (dp *dataProcessor) Outputs(processors ...DataProcessor) *dataProcessor {
+func (dp *StageDataProcessor) Outputs(processors ...DataProcessor) *StageDataProcessor {
 	dp.outputs = processors
 	return dp
 }
 
 // pass through String output to the DataProcessor
-func (dp *dataProcessor) String() string {
+func (dp *StageDataProcessor) String() string {
 	return fmt.Sprintf("%v", dp.DataProcessor)
 }

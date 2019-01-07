@@ -17,9 +17,9 @@ Each data processor is receiving, processing, and then sending data to the next 
 ## Getting Started
 
 - Check out the full Godoc reference:
- [![GoDoc](https://godoc.org/github.com/dailyburn/ratchet?status.svg)](https://godoc.org/github.com/dailyburn/ratchet)
+ [![GoDoc](https://godoc.org/github.com/MrLYC/ratchet?status.svg)](https://godoc.org/github.com/MrLYC/ratchet)
 - Get Ratchet:
-      go get github.com/dailyburn/ratchet
+      go get github.com/MrLYC/ratchet
 
   Ratchet comes with vendored dependencies so it can work out of the box if you use go1.6 (or go1.5 with the GO15VENDOREXPERIMENT environment variable
   set to 1).
@@ -30,11 +30,11 @@ Each data processor is receiving, processing, and then sending data to the next 
   you can download them into your project's vendor folder--along with ratchet--by running:
 
         govendor sync
-        govendor add github.com/dailyburn/ratchet
-        govendor add github.com/dailyburn/ratchet/data
-        govendor add github.com/dailyburn/ratchet/logger
-        govendor add github.com/dailyburn/ratchet/processors
-        govendor add github.com/dailyburn/ratchet/util
+        govendor add github.com/MrLYC/ratchet
+        govendor add github.com/MrLYC/ratchet/data
+        govendor add github.com/MrLYC/ratchet/logger
+        govendor add github.com/MrLYC/ratchet/processors
+        govendor add github.com/MrLYC/ratchet/util
 
 While not necessary, it may be helpful to understand
 some of the pipeline concepts used within Ratchet's internals: https://blog.golang.org/pipelines

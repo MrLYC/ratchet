@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	"sync"
 
-	"github.com/dailyburn/ratchet/data"
-	"github.com/dailyburn/ratchet/logger"
-	"github.com/dailyburn/ratchet/util"
+	"github.com/MrLYC/ratchet/data"
+	"github.com/MrLYC/ratchet/logger"
+	"github.com/MrLYC/ratchet/util"
 )
 
 // StartSignal is what's sent to a starting DataProcessor
@@ -42,7 +42,7 @@ func NewPipeline(processors ...DataProcessor) *Pipeline {
 		if i < len(processors)-1 {
 			dp.Outputs(processors[i+1])
 		}
-		stages[i] = NewPipelineStage([]*dataProcessor{dp}...)
+		stages[i] = NewPipelineStage([]*StageDataProcessor{dp}...)
 	}
 	p.layout, _ = NewPipelineLayout(stages...)
 	return p
@@ -58,11 +58,11 @@ func NewBranchingPipeline(layout *PipelineLayout) *Pipeline {
 }
 
 // In order to support the branching PipelineLayout creation syntax, the
-// dataProcessor.outputs are "DataProcessor" interface types, and not the "dataProcessor"
+// StageDataProcessor.outputs are "DataProcessor" interface types, and not the "StageDataProcessor"
 // wrapper types. This function loops through the layout and matches the
 // interface to wrapper objects and returns them.
-func (p *Pipeline) dataProcessorOutputs(dp *dataProcessor) []*dataProcessor {
-	dpouts := make([]*dataProcessor, len(dp.outputs))
+func (p *Pipeline) dataProcessorOutputs(dp *StageDataProcessor) []*StageDataProcessor {
+	dpouts := make([]*StageDataProcessor, len(dp.outputs))
 	for i := range dp.outputs {
 		for _, stage := range p.layout.stages {
 			for j := range stage.processors {
@@ -75,10 +75,10 @@ func (p *Pipeline) dataProcessorOutputs(dp *dataProcessor) []*dataProcessor {
 	return dpouts
 }
 
-// At this point in pipeline initialization, every dataProcessor has an input
+// At this point in pipeline initialization, every StageDataProcessor has an input
 // and output channel, but there is nothing connecting them together. In order
 // to support branching and merging between stages (as defined by each
-// dataProcessor's outputs), we set up some intermediary channels that will
+// StageDataProcessor's outputs), we set up some intermediary channels that will
 // manage copying and passing data between stages, as well as properly closing
 // channels when all data is received.
 func (p *Pipeline) connectStages() {
@@ -119,7 +119,7 @@ func (p *Pipeline) runStages(killChan chan error) {
 		for _, dp := range stage.processors {
 			p.wg.Add(1)
 			// Each DataProcessor runs in a separate gorountine.
-			go func(n int, dp *dataProcessor) {
+			go func(n int, dp *StageDataProcessor) {
 				// This is where the main DataProcessor interface
 				// functions are called.
 				logger.Info(p.Name, "- stage", n+1, dp, "waiting to receive data")

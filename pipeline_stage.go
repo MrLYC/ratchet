@@ -2,11 +2,11 @@ package ratchet
 
 // PipelineStage holds one or more DataProcessor instances.
 type PipelineStage struct {
-	processors []*dataProcessor
+	processors []*StageDataProcessor
 }
 
 // NewPipelineStage creates a PipelineStage instance given a series
-// of dataProcessors. dataProcessor (lower-case d) is a private wrapper around
+// of dataProcessors. StageDataProcessor (lower-case d) is a private wrapper around
 // an object implementing the public DataProcessor interface. The
 // syntax used to create PipelineLayouts abstracts this type
 // away from your implementing code. For example:
@@ -21,11 +21,11 @@ type PipelineStage struct {
 //
 // Notice how the ratchet.Do() and Outputs() functions allow you to insert
 // DataProcessor instances into your PipelineStages without having to
-// worry about the internal dataProcessor type or how any of the
+// worry about the internal StageDataProcessor type or how any of the
 // channel management works behind the scenes.
 //
 // See the ratchet package documentation for more code examples.
-func NewPipelineStage(processors ...*dataProcessor) *PipelineStage {
+func NewPipelineStage(processors ...*StageDataProcessor) *PipelineStage {
 	return &PipelineStage{processors}
 }
 
